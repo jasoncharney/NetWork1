@@ -28,3 +28,12 @@ function tssEcho(){
     tss.play();
     tssEnv.play(tss, 0, random(0,2));
 }
+
+function tssViz(){
+    background(0);
+    fill(255);
+    var tssLevel = tssAmp.getLevel();
+    for (var i = 0; i < 1000; i++){
+        ellipse(random(width),random(height),tssLevel*100,tssLevel*100);
+    }
+}

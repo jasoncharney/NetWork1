@@ -3,6 +3,7 @@ var connectedUsers = new Array();
 var numConnections;
 var isMasterConnected = false;
 var masterID;
+var currentMode;
 
 //node server set up
 
@@ -11,7 +12,6 @@ var app = express();//store the result of express(); in a variable called app
 var server = app.listen(port);//open the port on the port
 
 app.use(express.static('public'));
-//app.use(express.static('master-computer'));
 
 console.log("Socket server is open on port: "+ port);
 
@@ -23,11 +23,10 @@ io.sockets.on('connection', onConnect);
 
 function onConnect(socket){
   //on connection, trigger "welcome" function
-  socket.emit('role', 'welcome', 0);
+  socket.emit('mode', 'welcome');
 
   //let them know if they can become master upon pressing correct key
   if (isMasterConnected == false){
-    console.log(isMasterConnected);
     socket.emit('acceptingMaster',true);
   }
 
@@ -36,7 +35,7 @@ function onConnect(socket){
    socket.on('makeMeMaster',function(kingMe){
     if (kingMe == 1){
       masterID = socket.id;
-      socket.emit('role', 'master');
+      socket.emit('iAmMaster', true);
       console.log('Master is connected at device: ' + socket.id);
       isMasterConnected = true;
       socket.broadcast.emit('acceptingMaster',false);
@@ -45,13 +44,18 @@ function onConnect(socket){
 
   //listen for 'ready' function: when user clicks screen.
 
-  socket.on('ready',function(ready){
+  socket.on('ready',function(){
     //when they click, advance to next role.
-    if (ready == 1){
-      socket.emit('role', 'tss');
-      }
+     console.log(currentMode);
+      socket.emit('mode', currentMode);
+      });
+
+  socket.on('newMode',function(modeSelect){
+    currentMode = modeSelect;
+    console.log(currentMode);
+    socket.broadcast.emit('mode',currentMode);
   });
-  
+
   socket.on('boomplay',function(boomplaying){
     socket.broadcast.emit('tssEcho', 1);
   });
