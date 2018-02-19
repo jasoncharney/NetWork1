@@ -11,9 +11,10 @@ var acceptingMaster;
 var iAmMaster = false;
 var tssAmp, tssLevel;
 var tssEnv;
+var beepEnvTime;
 var mode;
 
-var beep, beepEnv, beepLevel;
+var beep, beepLevel;
 
 var beepFund = 200;
 
@@ -37,7 +38,7 @@ function setup(){
   boomLoad();
   tssLoad();
   beepLoad();
-    var beepRepeat = setInterval(beepPlay,1000);
+
   //gradients
   c1 = createVector(100,100,100);
   c2 = createVector(127,127,127);
@@ -69,26 +70,32 @@ function setup(){
     });
 
     socket.on('mode',function(_mode){
-        mode = _mode;
-        if (mode == 'welcome'){
-            fade = 0;
-        }
-        if (mode == 'beepPass',function(passTheBeep){
-            //beepRepeat;
+            mode = _mode;
+            if (mode == 'welcome'){
+                fade = 0;
+            }
         });
+    
+
+    socket.on('tssEcho',function(start){
+        if (start == 1){
+        setTimeout(tssEcho,random(200,1000));
+        }
     });
 
-    socket.on('tssEcho',function(){
-        setTimeout(tssEcho,random(200,1000));
+    socket.on('beepPassStart',function(start){
+        if (start == 1){
+        beepPlay();
+        }
     });
+
+
 
   noStroke();
 
-
-}
+}//end of setup
 
 //single sound events triggered by server...visualization in draw? With settings passed through from audio events.
-
 
 
 function draw(){
@@ -113,9 +120,9 @@ if (iAmMaster == true){
     if (mode == 'gradients'){
         gradientMaster(500);
     }
-    if (mode == 'beepPass'){
-
-    }
+//     if (mode == 'beepPass'){
+//         beepPlay();
+//     }
 }
 if (iAmMaster == false){
     if (mode == 'welcome'){
@@ -129,7 +136,7 @@ if (iAmMaster == false){
         gradientMaster(100);
     }
     if (mode == 'beepPass'){
-        beepViz();
+        //beepViz();
     }
 }
 

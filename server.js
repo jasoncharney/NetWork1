@@ -65,12 +65,19 @@ function onConnect(socket){
     currentMode = modeSelect;
     //console.log(currentMode);
     socket.broadcast.emit('mode',currentMode);
+
+    if (currentMode == 'beepPass'){
+      socket.emit('beepPassStart',1);
+    }
   });
 
   socket.on('boomplay',function(boomplaying){
     socket.broadcast.emit('tssEcho', 1);
   });
 
+  socket.on('beepEnd',function(_beepEnvTime){
+    socket.to(connectedUsers[(connectedUsers.indexOf(socket.id)+1)%connectedUsers.length]).emit('beepPassStart');
+  });
   //When user disconnects, echo in console.
   
   //if user was master, allow new masters to join (must refresh if already role 1/waiting)

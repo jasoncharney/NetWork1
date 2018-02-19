@@ -3,7 +3,11 @@ function beepLoad(){
     beep.freq(beepFund);
     beepEnv = new p5.Env();
     beepAmp = new p5.Amplitude();
-    beepEnv.setADSR(random(0,0.05),random(1,2),random(0.8,1.),random(0.01,0.05));
+    var beepEnvAttack = 0.05;
+    var beepEnvDecay = 1.;
+    var beepEnvRelease = 0.5;
+    beepEnvTime = (beepEnvAttack + beepEnvDecay + beepEnvRelease)*1000;
+    beepEnv.setADSR(beepEnvAttack,beepEnvDecay,0.8,beepEnvRelease);
     beep.start();
     beep.amp(beepEnv);
     beepAmp.setInput(beep);
@@ -11,6 +15,8 @@ function beepLoad(){
 
 function beepPlay(){
     beepEnv.play();
+    console.log(beepEnvTime);
+    setTimeout(socket.emit('beepEnd',beepEnvTime));
 }
 
 function beepViz(loc){
