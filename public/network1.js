@@ -3,6 +3,7 @@
 
 var socket;
 var myRole;
+var clientNumber; //number representing which client they are. Updates when clients disconnect (FIFO)
 var myFont;
 var fade;
 var boom, boomAmp, boomLevel;
@@ -11,6 +12,10 @@ var iAmMaster = false;
 var tssAmp, tssLevel;
 var tssEnv;
 var mode;
+
+var beep, beepEnv, beepLevel;
+
+var beepFund = 200;
 
 var colorLFO = new Array(6);
 var colorLFOAmp = new Array(6);
@@ -31,7 +36,8 @@ function setup(){
   //boomTss
   boomLoad();
   tssLoad();
-
+  beepLoad();
+    var beepRepeat = setInterval(beepPlay,1000);
   //gradients
   c1 = createVector(100,100,100);
   c2 = createVector(127,127,127);
@@ -57,11 +63,19 @@ function setup(){
         iAmMaster = _iAmKinged;
     });
 
+    socket.on('clientNumber', function(socketID){
+        clientNumber = socketID;
+        console.log(clientNumber);
+    });
+
     socket.on('mode',function(_mode){
         mode = _mode;
         if (mode == 'welcome'){
             fade = 0;
         }
+        if (mode == 'beepPass',function(passTheBeep){
+            //beepRepeat;
+        });
     });
 
     socket.on('tssEcho',function(){
@@ -78,12 +92,13 @@ function setup(){
 
 
 function draw(){
-    socket.on('mode',function(_mode){
-        mode = _mode;
-        if (mode == 'welcome'){
-            fade = 0;
-        }
-    });
+
+    // socket.on('mode',function(_mode){
+    //     mode = _mode;
+    //     if (mode == 'welcome'){
+    //         fade = 0;
+    //     }
+    // });
 
 
    background(0);
@@ -98,6 +113,9 @@ if (iAmMaster == true){
     if (mode == 'gradients'){
         gradientMaster(500);
     }
+    if (mode == 'beepPass'){
+
+    }
 }
 if (iAmMaster == false){
     if (mode == 'welcome'){
@@ -110,8 +128,13 @@ if (iAmMaster == false){
         fill(0,255,0);
         gradientMaster(100);
     }
+    if (mode == 'beepPass'){
+        beepViz();
+    }
 }
 
+fill(255,0,0);
+text(str(clientNumber),width/2,height/2);
     
 }
 
@@ -121,7 +144,7 @@ function chooseMode(){
     textSize(24);
     textAlign(CENTER);
     rectMode(CENTER);
-    text('Choose mode:\n1: Boom/Tss\n2:Gradients\n3:',width/2,100);
+    text('Choose mode:\n1: Boom/Tss\n2:Gradients\n3:beepPass',width/2,100);
     //text('1: Boom/Tss',width/2,100);
     }
 
@@ -188,6 +211,9 @@ function keyPressed(){
         }
         if (key === '2'){
             mode = 'gradients';
+        }
+        if (key === '3'){
+            mode = 'beepPass';
         }
     }
     socket.emit('newMode',mode);

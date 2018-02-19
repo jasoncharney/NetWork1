@@ -12,5 +12,14 @@
   "dependencies": {
     "express": "^4.16.2",
     "socket.io": "^2.0.4"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasoncharney/NetWork1.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jasoncharney/NetWork1/issues"
+  },
+  "homepage": "https://github.com/jasoncharney/NetWork1#readme"
 }
