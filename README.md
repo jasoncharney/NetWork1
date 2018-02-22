@@ -13,13 +13,19 @@ The work will start as a series of episodic sketches, all of similar aesthetic b
 3. **beepPass** - a single pulse gets passed around the client devices 
 
 ## To Do...
-- Perhaps run the master as a separate file? Or, figure out namespaces in socket. Better controlling events...
+- Perhaps run the master as a separate file? Or, figure out namespaces in socket. Better controlling events...but, the master doesn't always have to run on the same device as the server.
 - Learn streaming functions...(socket.io.stream)
-- Get out of localhost onto a local server so other devices can connect! Not sure how to set up ports etc./static routing.
+<s>- Get out of localhost onto a local server so other devices can connect! Not sure how to set up ports etc./static routing.</s>
 - Figure out static functions better within the draw function (only visualizations occurring inside draw...)
-- Remake so 0th user is always the master (don't need extra designation of master function, etc.)
+<s>- Remake so 0th user is always the master (don't need extra designation of master function, etc.)</s>
 
 ## Progress log
+#### 2/21
+- Figured out connecting multiple devices on a local network
+- Changed geometries of drumPass/renamed a bunch of variables
+- drumPass sends changes on envelopes
+- to do: automatic joining - disable welcome screen?
+- made some changes to boomTss...
 #### 2/19
 - Figured out how to re-index users upon disconnections (everyone moves up in the connected user list)
 - Change in mode from the master device is sent to other users
