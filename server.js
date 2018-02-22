@@ -20,6 +20,7 @@ var app = express(); //store the result of express(); in a variable called app
 var server = app.listen(port); //open the port on the port
 
 app.use(express.static('public'));
+app.use(express.static('control'));
 
 console.log("Socket server is open on port: " + port);
 
@@ -27,8 +28,23 @@ var socket = require('socket.io'); //import socket package
 
 var io = socket(server); //use the server as a socket
 
-io.sockets.on('connection', onConnect);
+//Create control page – serve up separately, add to its own room.
+//define levels of clients, send back to controller page to re-organize/switch modes/roles
+//clients connected are separate from control page connections (force only one control page at a time)
+// var controlPage = io.of('/control');
 
+// controlPage.on('connection', controlConnect);
+
+// function controlConnect(socket){
+//   console.log('Controller connected');
+//   socket.join('control');
+//   socket.on('hi',function(){
+//     console.log('hiii');
+//     controlPage.emit('hi','hi');
+//   });
+// }
+
+io.sockets.on('connection', onConnect);
 
 function onConnect(socket) {
   //on connection, trigger "welcome" function
@@ -44,6 +60,10 @@ function onConnect(socket) {
 
   socket.on('ready', function () {
     socket.emit('mode', currentMode);
+  });
+
+  socket.on('hi', function(o){
+    console.log(o);
   });
 
   //newMode can only come from the master device!
