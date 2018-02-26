@@ -15,6 +15,8 @@ Ideally the work will exploit the latency or other network features/relationship
 3. **drumPass** - a beat gets passed around the client devices.
 
 ## To Do...
+- Clear timeouts/stop triggering sounds when modes change.
+- Load assets as needed depending on mode/as a callback so clients don't have to wait so long. Test out if it's better with a dedicated router/local network.
 - Perhaps run the master as a separate file? Or, figure out namespaces in socket. Better controlling events...but, the master doesn't always have to run on the same device as the server.
     - Along these lines, create separate file to control events/router.
     - Namespaces/channelized sockets? Allow for subdividing clients into further roles/groups.
@@ -24,6 +26,12 @@ Ideally the work will exploit the latency or other network features/relationship
 <s>- Remake so 0th user is always the master (don't need extra designation of master function, etc.)</s>
 
 ## Progress log
+#### 2/25
+- Added control page, as a separate namespace (gets and sends to server)
+- Client no longer needs to tap the screen to join (deprecated 'ready' function)
+- Gradients functions: oscillator bank or (right now) looping background texture. Press a button to move a filter and make the screen shimmer in white. Right now the oscillators are disconnected but 
+- To do: Make different versions of the backing texture and use the oscillators to make dynamic foreground sounds.
+
 #### 2/21
 - Figured out connecting multiple devices on a local network
 - Changed geometries of drumPass/renamed a bunch of variables

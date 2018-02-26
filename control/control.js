@@ -1,36 +1,40 @@
-var boomTssbutton;
-var drumPassbutton;
-var socket;
-
-function preload(){
-}
-
-function setup(){
-    socket = io.connect();
-
-    socket = io('/control');
-    createCanvas(window.innerWidth,window.innerHeight);
-    textSize(25);
-    text('NetWork 1 Controls',0,25);
-    boomTssbutton = createButton('boomTss');
-    boomTssbutton.position(0,30);
-    boomTssbutton.mousePressed(function(){
-        socket.emit('hi');
+var socket = io('/controller');
+var timeUp;
+var refresh = 1000;
+var startTime;
+$(document).ready(function(){
+    startTime = new Date();
+    timeCount();
+    $('#drumPass').click(function(){
+      socket.emit('newMode','drumPass');
     });
-    
-    socket.on('hi',function(){
-        console.log('hi');
+    $('#boomTss').click(function(){
+        socket.emit('newMode','boomTss');
     });
+    $('#gradients').click(function(){
+        socket.emit('newMode','gradients');
+    });
+    $('#shineItUp').click(function(){
+        socket.emit('shineItUp','1');
+    });
+
+socket.on('numClients',function(numConnections){
+    document.getElementById('clientsConnected').innerHTML ='Clients connected: ' + numConnections;
+
+    });
+});
+
+function timeCount(){
+    setInterval('displayTime()',refresh);
 }
 
-function emits(){
-    socket.emit('hi',1);
+function displayTime(){
+    var endTime = new Date();
+    var timeDiff = endTime - startTime;
+    timeDiff /= 1000;
+    var secs = Math.round(timeDiff % 60);
+    var min = Math.floor(timeDiff / 60);
+    document.getElementById('timeConnected').innerHTML = 'Time up: ' + min + ":" + secs; 
 }
 
-function draw(){
-}
-
-function windowResized(){
-resizeCanvas(window.innerWidth,window.innerHeight);
-text('NetWork 1 Controls',0,10);
-}
+    // document.getElementById('clientList').innerHTML ='Client list: ' + connectedUsers;

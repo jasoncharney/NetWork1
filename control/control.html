@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -10,7 +11,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
     <script src="https://p5js.org/assets/js/p5.dom.min.js"></script>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <!-- <script src="control.js"></script> -->
     <script src="control.js"></script>
+    </head>
+
     <style type="text/css">
         body {margin:0; padding:0;}
         canvas {display:block;}
@@ -19,9 +26,18 @@
             #enter {display:block;}
             #exit {display:none;}
           </style>
-        
-  </head>
-  <body>
 
-  </body>
+  <body>
+      <div id="titles">
+        <h2>NetWork1 Controls</h2>
+      </div>
+      <div>
+        <button id='drumPass' type="button">drumPass</button>
+        <button id="boomTss" type="button">boomTss</button>
+        <button id="gradients" type="button">gradients</button>
+      </div>
+        <div id='clientsConnected' onload='Waiting'></div>
+        <div id='timeConnected' onload='timeCount();'></div>
+        <button id='shineItUp' type="button">shine it up!</button>
+</body>
 </html>

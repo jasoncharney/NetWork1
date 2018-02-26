@@ -1,6 +1,3 @@
-//2/15
-//LOOK AT CLIENT SIDE SOCKET API!!!
-
 var socket;
 var myRole;
 var clientNumber; //number representing which client they are. Updates when clients disconnect (FIFO)
@@ -16,6 +13,7 @@ var mode;
 
 var colorLFO = new Array(6);
 var colorLFOAmp = new Array(6);
+var gradientLoop;
 
 var drums = new Array(6);
 var baseDelayTime = 100;
@@ -26,6 +24,7 @@ function preload() {
     boom = loadSound('assets/boom.mp3');
     tss = loadSound('assets/tss.mp3')
     myFont = loadFont('assets/Gulim.ttf');
+    gradientLoop = loadSound('assets/gradientloop.mp3');
     drumLoad(128);
 }
 
@@ -35,25 +34,12 @@ function setup() {
 
     //load settings for all modes: perhaps move this to happen upon role selection.
 
-    //boomTss
     boomLoad();
     tssLoad();
     gradientLoad();
 
-    //gradients
-
-
-    socket = io.connect();
-
-
-    // socket.on('acceptingMaster',function(_master){
-    //     acceptingMaster = _master;
-    // });
-
-    // socket.on('iAmMaster',function(_iAmKinged){
-    //     iAmMaster = _iAmKinged;
-    // });
-
+    socket = io('/client');
+    //right now client 0 is always "master"
     socket.on('clientNumber', function (socketID) {
         clientNumber = socketID;
         document.title = 'Client Number: ' + clientNumber;
@@ -66,17 +52,21 @@ function setup() {
 
     socket.on('mode', function (_mode) {
         mode = _mode;
-        if (mode == 'welcome') {
-            fade = 0;
+        if (mode == 'gradients') {
+            //gradientPlay();
+        }
+        else{
+            //gradientStop();
         }
     });
 
     socket.on('tssEcho', function (start) {
-        if (start == 1) {
-            setTimeout(tssEcho, random(200, 1000));
-        }
+             setTimeout(tssEcho, random(200, 1000));
     });
 
+    socket.on('shineItUp', function () {
+        setTimeout(shineItUp, random(200, 1000));
+    });
     socket.on('drumPassStart', function (start) {
         if (start == 1) {
             drumPlay();
@@ -89,21 +79,28 @@ function setup() {
         }
     });
 
+    socket.on('boomPlay', function(_boom){
+        if (master == true){
+        boomPlay(_boom);
+        }
+    });
+
+    socket.on('shineItUp',function(){
+        shineItUp();
+    });
+
     noStroke();
 
 } //end of setup
 
 //single sound events triggered by server...visualization in draw? With settings passed through from audio events.
 
-
 function draw() {
 
     if (master == true) {
-        if (mode == 'welcome') {
-            chooseMode();
-        }
+
         if (mode == 'boomTss') {
-            boomer();
+            boomViz();
         }
         if (mode == 'gradients') {
             gradientMaster(500);
@@ -113,9 +110,7 @@ function draw() {
         }
     }
     if (master == false) {
-        if (mode == 'welcome') {
-            welcomeViz();
-        }
+
         if (mode == 'boomTss') {
             tssViz();
         }
@@ -126,65 +121,33 @@ function draw() {
             drumViz();
         }
     }
+    gradientFilter.freq(map(shineEnvLevel.getLevel(),0.,1.,100,3000));
 
 }
 
-function chooseMode() {
-    background(255);
-    fill(0);
-    textSize(24);
-    textAlign(CENTER);
-    rectMode(CENTER);
-    text('Choose mode:\n1: Boom/Tss\n2:Gradients\n3:drumPass', width / 2, 100);
-    //text('1: Boom/Tss',width/2,100);
-}
 
 
-function boomer() {
-    background(255);
-    boomPlay(frameCount % 500);
-    fill(0);
-    ellipse(width / 2, height / 2, boomLevel * 500, boomLevel * 500);
-}
-
-function welcomeViz() {
-    var fontSize = width * 0.1;
-    fade += 1;
-    background(0);
-    fill(255, fade);
-    textFont(myFont);
-    textSize(fontSize);
-    textAlign(CENTER);
-    text('welcome', width / 2, height / 2);
-    rectMode(CENTER);
-    fill(255, map(abs(sin(radians(frameCount * 2))), 0, QUARTER_PI, 0, 255));
-    textSize(fontSize * 0.25);
-    text('Click to join.', width / 2, height / 2 + (fontSize), textWidth('Click to join.') * 1.75, fontSize);
-}
+// function welcomeViz() {
+//     var fontSize = width * 0.1;
+//     fade += 1;
+//     background(0);
+//     fill(255, fade);
+//     textFont(myFont);
+//     textSize(fontSize);
+//     textAlign(CENTER);
+//     text('welcome', width / 2, height / 2);
+//     rectMode(CENTER);
+//     fill(255, map(abs(sin(radians(frameCount * 2))), 0, QUARTER_PI, 0, 255));
+//     textSize(fontSize * 0.25);
+//     text('Click to join.', width / 2, height / 2 + (fontSize), textWidth('Click to join.') * 1.75, fontSize);
+// }
 
 function windowResized() {
     resizeCanvas(window.innerWidth, window.innerHeight);
 }
 
-function touchStarted() {
-    if (mode == 'welcome' && master == false) {
-        socket.emit('ready');
-    }
-}
-
 function keyPressed() {
-    if (key === '1' || key === '2' || key === '3') {
-        if (clientNumber == 0) {
-            if (key === '1') {
-                mode = 'boomTss';
-            }
-            if (key === '2') {
-                mode = 'gradients';
-            }
-            if (key === '3') {
-                mode = 'drumPass';
-            }
-            socket.emit('newMode', mode);
-        }
+    if (key === '1' && mode === 'gradients') {
+        shineItUp();
     }
 }

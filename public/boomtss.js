@@ -23,13 +23,22 @@ function tssLoad(){
     }
 }
 
-function boomPlay(boomTrigger){
-    boomLevel = boomAmp.getLevel();
-    if (boomTrigger == 1){
-        boom.rate(random(0.5,1.));
-        boom.play();
-        socket.emit('boomplay',1);
+function boomPlay(_boom){
+    if (_boom == 1){
+    boom.rate(random(0.5,1.));
+    boom.play();
+    socket.emit('boomHasPlayed',1);
     }
+    if (_boom == 0){
+    boom.stop();
+    }
+}
+
+function boomViz() {
+    boomLevel = boomAmp.getLevel();
+    background(255);
+    fill(0);
+    ellipse(width / 2, height / 2, boomLevel * 500, boomLevel * 500);
 }
 
 function tssEcho(){
