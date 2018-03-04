@@ -17,6 +17,18 @@ $(document).ready(function(){
     $('#shineItUp').click(function(){
         socket.emit('shineItUp','1');
     });
+    $('#shockWave').click(function(){
+        socket.emit('newMode','shockWave');
+    });
+    $('#createShockwave').click(function(){
+        socket.emit('createShockwave','1');
+    });
+    $('#textFlicker').click(function(){
+        socket.emit('newMode','textFlicker');
+    });
+    $('#grassy').click(function(){
+        socket.emit('newMode','grassy');
+    });
 
 socket.on('numClients',function(numConnections){
     document.getElementById('clientsConnected').innerHTML ='Clients connected: ' + numConnections;

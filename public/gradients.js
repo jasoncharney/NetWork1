@@ -3,7 +3,6 @@ var gradientShine = new Array(gradientOscillatorNum);
 var gradientHarmonicDrift = new Array(gradientOscillatorNum);
 var gradientEnv = new p5.Env();
 var gradientHarmonicAmp = new Array(gradientOscillatorNum);
-var gradientVerb = new p5.Reverb();
 var gradientFilter = new p5.HighPass();
 var shineEnv = new p5.Env();
 var shineEnvLevel = new p5.Amplitude();
@@ -13,34 +12,18 @@ c1 = createVector(100,100,100);
 c2 = createVector(127,127,127);
     for (var i = 0; i < colorLFO.length; i++){
         colorLFO[i] = new p5.Oscillator('triangle');
+        colorLFO[i].disconnect();
         colorLFOAmp[i] = new p5.Amplitude();
         colorLFO[i].freq(random(0.01,0.05));
         colorLFO[i].amp(random(0.5,1.));
         colorLFO[i].phase(random(0.,1.));
-        colorLFO[i].disconnect();
         colorLFO[i].start();
         colorLFOAmp[i].setInput(colorLFO[i]);
     }
-    for (var i = 0; i < gradientOscillatorNum; i++){
-        gradientShine[i] = new p5.Oscillator();
-        gradientHarmonicDrift[i] = new p5.Oscillator();
-        gradientHarmonicDrift[i].freq(random(0.01,0.1));
-        gradientHarmonicDrift[i].phase(random(0.,1.));
-        gradientHarmonicDrift[i].disconnect();
-        gradientHarmonicDrift[i].start();
-        gradientHarmonicAmp[i] = new p5.Amplitude();
-        gradientHarmonicAmp[i].setInput(gradientHarmonicDrift[i]);
-        gradientShine[i].freq((i * 20)+200);
-        gradientShine[i].amp(random(0.5,0.7)*gradientHarmonicAmp[i].getLevel());
-        gradientShine[i].disconnect();
-        gradientVerb.process(gradientShine[i], 3, 2);
-    }
-    gradientVerb.disconnect();
-    gradientVerb.connect(gradientFilter);
     shineEnv.setADSR(1,2,0.5,3);
     shineEnvLevel.setInput(shineEnv);
     gradientLoop.loop(1);
-    gradientLoop.rate(random(1.,2.));
+    //gradientLoop.rate(random(1.,2.));
     gradientLoop.disconnect();
     gradientLoop.connect(gradientFilter);
 }
@@ -61,9 +44,9 @@ function gradientMaster(numRects){
         fill(lerpColor(col1,col2,colorInterp));
         rect(i*(width/numRects), height/2,(width/numRects)+1,height);
     }
-    for (var i = 0; i < gradientOscillatorNum; i++){
-        gradientShine[i].amp(gradientHarmonicAmp[i].getLevel());
-    }
+    // for (var i = 0; i < gradientOscillatorNum; i++){
+    //     gradientShine[i].amp(gradientHarmonicAmp[i].getLevel());
+    // }
 }
 
 function gradientPlay(){
@@ -76,9 +59,10 @@ function gradientPlay(){
 }
 
 function gradientStop(){
-    for (var i = 0; i < gradientOscillatorNum; i++){
-        gradientShine[i].stop();
-    }
+    // for (var i = 0; i < gradientOscillatorNum; i++){
+    //     gradientShine[i].stop();
+    // }
+    gradientLoop.stop();
 }
 
 function shineItUp(){

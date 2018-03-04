@@ -5,14 +5,14 @@ var isMasterConnected = false;
 var masterID;
 var currentMode;
 var boomRepeat;
+var nextDrum = 0;
 
-//COUNT NUMBER OF SAMPLES/FILES WITHIN A FOLDER...
-// var countFiles = require('count-files');
+//set the interaction changes for new connections
 
-// var drumSampleNumber = countFiles('public/assets/drums/', function (err, results) {
-//   console.log('done counting')
-//   console.log(results) // { files: 10, dirs: 2, bytes: 234 } 
-// })
+var LEVEL1 = 0;
+var LEVEL2 = 4;
+var LEVEL3 = 8;
+var LEVEL4 = 12;
 
 //SET UP NODE SERVER
 
@@ -42,19 +42,27 @@ function onControllerConnect(socket){
   socket.on('newMode', function (modeSelect) {
     console.log(modeSelect);
     currentMode = modeSelect;
+
+
     client.emit('mode', currentMode);
 
-    if (currentMode == 'drumPass') {
-      client.to(connectedUsers[0]).emit('drumPassStart', 1);
-    }
       boomPlayer(currentMode);
+
+      if (currentMode == 'drumPass'){
+     }
+     drumDistributor(currentMode);
+
   });
       socket.on('shineItUp', function (g) {
         client.emit('shineItUp');
       });
+      socket.on('createShockwave', function (g) {
+        client.emit('createShockwave');
+      });
     }
+
+ //client connection functions//   
 function onClientConnect(socket) {
-  //on connection, trigger "welcome" function
   client.emit('mode', currentMode);
   var socketID = socket.id;
   connectedUsers.push(socketID);
@@ -65,26 +73,23 @@ function onClientConnect(socket) {
   controller.emit('clientList',connectedUsers);
 
   var connectionIndex = connectedUsers.indexOf(socketID);
-  socket.emit('clientNumber', connectionIndex);
 
-  socket.on('drumEnd', function (_clientNumber) {
-    var nextClient;
-    if (_clientNumber < connectedUsers.length - 1) {
-      nextClient = _clientNumber + 1;
-    } else {
-      nextClient = 0;
-    }
-    socket.to(connectedUsers[nextClient]).emit('drumPass', 1);
-  });
+  socket.emit('clientNumber', connectionIndex);
 
   socket.on('boomHasPlayed', function () {
     socket.broadcast.emit('tssEcho');
   });
 
+  socket.on('waveNumber',function(_waveNumber,_waveDirection,_posx,_posy,_velx,_vely){
+    //console.log(_waveNumber);
+    socket.broadcast.emit('addWave',_waveDirection,_posx,_posy,_velx,_vely);
+  })
+  socket.on('drumEnd',function(){
+    nextDrum += 1;
+    drumDistributor(currentMode);
+  });
 
-  //When user disconnects, echo in console.
-
-  //if user was master, allow new masters to join (must refresh if already role 1/waiting)
+  //User disconnect functions.
 
   socket.on('disconnect', function() {
     var socketID = socket.id;
@@ -116,3 +121,21 @@ function boomPlayer(curMode){
 function boomEmit(){
     client.to(connectedUsers[0]).emit('boomPlay',1);
 }
+
+function drumDistributor(curMode){
+  //setInterval(socket.to(connectedUsers[nextClient]).emit('drumPass');)
+  if (curMode == 'drumPass'){
+  var drumDelayTimes = [1, 2, 4];
+  var baseDelayTime = 100;
+  setTimeout(drumSender, baseDelayTime * drumDelayTimes[Math.floor(Math.random() * drumDelayTimes.length)]);
+  }
+}
+
+function drumSender(){
+    //nextDrum += 1;
+    nextDrum = nextDrum % connectedUsers.length;
+    console.log(nextDrum);
+    client.to(connectedUsers[nextDrum]).emit('drumPass',1);
+}
+
+///DRUM SET UP

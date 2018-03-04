@@ -1,8 +1,7 @@
-var drumDelayTimes = [1, 2, 4, 8];
-var drumPeakDraw = 20;
-var newDirChoose, dirLimit;
-
+var drumPeakDraw;
+var drumNum;
 function drumLoad(fftSize){
+    drumNum = clientNumber % drums.length;
     for (i = 0; i < drums.length; i++){
         drums[i] = loadSound('assets/drums/'+i+'.mp3');
     }
@@ -10,20 +9,19 @@ function drumLoad(fftSize){
     drumAmp = new p5.Amplitude();
     drumAmp.toggleNormalize(1);
     drumFFT = new p5.FFT(1.,fftSize);
+    drumAmp.setInput(drums[drumNum]);
+    drumFFT.setInput(drums[drumNum]);
 }
 
 function drumPlay(){
-    var drumNum = clientNumber % drums.length;
     if (drumNum > 0){
         drums[drumNum].rate(random(1.,5.));
     }
-    drumAmp.setInput(drums[drumNum]);
-    drumFFT.setInput(drums[drumNum]);
     drums[drumNum].play();
     newDirChoose = true;
     drumPeakDraw = 20;
     //add a little bit of timed delay before triggering next client
-    setTimeout(socket.emit('drumEnd',clientNumber),baseDelayTime*0.5);
+    socket.emit('drumEnd',clientNumber);
 }
 
 function drumViz(){

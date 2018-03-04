@@ -17,8 +17,8 @@ Ideally the work will exploit the latency or other network features/relationship
 ## To Do...
 - Clear timeouts/stop triggering sounds when modes change.
 - Load assets as needed depending on mode/as a callback so clients don't have to wait so long. Test out if it's better with a dedicated router/local network.
-- Perhaps run the master as a separate file? Or, figure out namespaces in socket. Better controlling events...but, the master doesn't always have to run on the same device as the server.
-    - Along these lines, create separate file to control events/router.
+<s>- Perhaps run the master as a separate file? Or, figure out namespaces in socket. Better controlling events...but, the master doesn't always have to run on the same device as the server.
+    - Along these lines, create separate file to control events/router.</s>
     - Namespaces/channelized sockets? Allow for subdividing clients into further roles/groups.
 - Learn streaming functions...(socket.io.stream)
 <s>- Get out of localhost onto a local server so other devices can connect! Not sure how to set up ports etc./static routing.</s>
@@ -26,6 +26,9 @@ Ideally the work will exploit the latency or other network features/relationship
 <s>- Remake so 0th user is always the master (don't need extra designation of master function, etc.)</s>
 
 ## Progress log
+
+#### 3/2
+-Added shockwave function – using instances to propagate a shockwave of particles from master to clients. Particles continue in direction of propagation (with origin at center)
 #### 2/25
 - Added control page, as a separate namespace (gets and sends to server)
 - Client no longer needs to tap the screen to join (deprecated 'ready' function)

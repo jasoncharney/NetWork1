@@ -16,15 +16,14 @@ var colorLFOAmp = new Array(6);
 var gradientLoop;
 
 var drums = new Array(6);
-var baseDelayTime = 100;
 
 //load all assets that will be used.
 
 function preload() {
     boom = loadSound('assets/boom.mp3');
-    tss = loadSound('assets/tss.mp3')
+    tss = loadSound('assets/tss.mp3');
     myFont = loadFont('assets/Gulim.ttf');
-    gradientLoop = loadSound('assets/gradientloop.mp3');
+    gradientLoop = loadSound('assets/gradientloop.mp3'); 
     drumLoad(128);
 }
 
@@ -36,7 +35,9 @@ function setup() {
 
     boomLoad();
     tssLoad();
-    gradientLoad();
+    //gradientLoad();
+    textLoad();
+    grassyLoad();
 
     socket = io('/client');
     //right now client 0 is always "master"
@@ -52,11 +53,12 @@ function setup() {
 
     socket.on('mode', function (_mode) {
         mode = _mode;
+        clearTimeout(drumPlay);
         if (mode == 'gradients') {
-            //gradientPlay();
+            gradientPlay();
         }
         else{
-            //gradientStop();
+            gradientStop();
         }
     });
 
@@ -67,16 +69,9 @@ function setup() {
     socket.on('shineItUp', function () {
         setTimeout(shineItUp, random(200, 1000));
     });
-    socket.on('drumPassStart', function (start) {
-        if (start == 1) {
-            drumPlay();
-        }
-    });
-
-    socket.on('drumPass', function (start) {
-        if (start == 1) {
-            setTimeout(drumPlay, baseDelayTime * drumDelayTimes[int(random(0, drumDelayTimes.length - 1))]);
-        }
+    
+    socket.on('drumPass', function() {
+        drumPlay(clientNumber);
     });
 
     socket.on('boomPlay', function(_boom){
@@ -88,8 +83,19 @@ function setup() {
     socket.on('shineItUp',function(){
         shineItUp();
     });
+    socket.on('createShockwave',function(){
+        if (master == true){
+        wavePopulate();
+        }
+    });
+    socket.on('addWave',function(_waveDirection,_posx,_posy,_velx,_vely){
+        if (master == false){
+            addWave(_waveDirection,_posx,_posy,_velx,_vely);
+        }
+    });
 
     noStroke();
+
 
 } //end of setup
 
@@ -108,6 +114,21 @@ function draw() {
         if (mode == 'drumPass') {
             drumViz();
         }
+        if (mode == 'shockWave'){
+            background(0);
+            wavePropagate();
+        }
+        if (mode == 'textFlicker'){
+            //fill(255);
+            if (frameCount % 5 == 0){
+            textLoad();
+            }
+            textFlick();
+        }
+        if (mode == 'grassy'){
+            grassAttractor();
+            grassMove();
+        }
     }
     if (master == false) {
 
@@ -120,30 +141,21 @@ function draw() {
         if (mode == 'drumPass') {
             drumViz();
         }
+        if (mode == 'shockWave'){
+            background(0);
+            wavePropagate();
+        }
+        if (mode == 'grassy'){
+            grassAttractor();
+            grassMove();
+        }
     }
-    gradientFilter.freq(map(shineEnvLevel.getLevel(),0.,1.,100,3000));
 
 }
 
-
-
-// function welcomeViz() {
-//     var fontSize = width * 0.1;
-//     fade += 1;
-//     background(0);
-//     fill(255, fade);
-//     textFont(myFont);
-//     textSize(fontSize);
-//     textAlign(CENTER);
-//     text('welcome', width / 2, height / 2);
-//     rectMode(CENTER);
-//     fill(255, map(abs(sin(radians(frameCount * 2))), 0, QUARTER_PI, 0, 255));
-//     textSize(fontSize * 0.25);
-//     text('Click to join.', width / 2, height / 2 + (fontSize), textWidth('Click to join.') * 1.75, fontSize);
-// }
-
 function windowResized() {
     resizeCanvas(window.innerWidth, window.innerHeight);
+    grassyLoad();
 }
 
 function keyPressed() {
